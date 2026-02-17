@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sundarban Images</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --dark-bg: #333;
+            --light-bg: #f4f4f4;
+        }
+
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background-color: var(--light-bg); }
+
+
+        .header { text-align: center; padding: 40px 20px; background: white; border-bottom: 1px solid #ddd; }
+        .header h1 { color: var(--primary-color); margin: 0; }
+
+        /* Gallery Grid */
+        .gallery-section { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        .gallery-item { cursor: pointer; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #000; position: relative; }
+        .gallery-item img { width: 100%; height: 220px; object-fit: cover; display: block; transition: 0.3s; }
+        .gallery-item:hover img { transform: scale(1.05); opacity: 0.8; }
+
+        /* Pagination Styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+            gap: 10px;
+        }
+        .page-btn {
+            padding: 10px 20px;
+            background-color: var(--dark-bg);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .page-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .page-btn:hover:not(:disabled) { background-color: var(--primary-color); }
+        #pageIndicator { font-weight: bold; }
+
+        /* Modal (Same as before) */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
+        .modal-content { max-width: 90%; max-height: 80vh; }
+        .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Sunderban</h1>
+        <p>Images</p>
+    </header>
+
+    <main class="gallery-section">
+        <div class="gallery-grid" id="galleryGrid"></div>
+
+        <div class="pagination">
+            <button class="page-btn" id="prevPage" disabled>Previous</button>
+            <span id="pageIndicator">Page 1</span>
+            <button class="page-btn" id="nextPage">Next</button>
+        </div>
+    </main>
+
+    <div id="imageModal" class="modal">
+        <span class="close-btn">&times;</span>
+        <img class="modal-content" id="fullImage">
+        <div id="caption" style="color:white; margin-top:15px;"></div>
+    </div>
+
+    <script>
+        // 1. ADD YOUR IMAGES HERE
+        const imageList = [
+            { src: 'Jpeg Sorted//1.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//2.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//3.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//4.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//5.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//6.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//7.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//8.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//9.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//10.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//11.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//12.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//13.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//14.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//15.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//16.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//17.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//18.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//19.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//20.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//21.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//22.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//23.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//24.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//25.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//26.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//27.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//28.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//29.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//30.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//31.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//32.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//33.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//34.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//35.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//36.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//37.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//38.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//39.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//40.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//41.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//42.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//43.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//44.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//45.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//46.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//47.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//48.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//49.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//50.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//51.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//52.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//53.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//54.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//55.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//56.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//57.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//58.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//59.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//60.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//61.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//62.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//63.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//64.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//65.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//66.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//67.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//68.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//69.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//70.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//71.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//72.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//73.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//74.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//75.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//76.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//77.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//78.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//79.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//80.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//81.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//82.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//83.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//84.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//85.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//86.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//87.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//88.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//89.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//90.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//91.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//92.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//93.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//94.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//95.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//96.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//97.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//98.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//99.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//100.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//101.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//102.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//103.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//104.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//105.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//106.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//107.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//108.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//109.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//110.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//111.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//112.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//113.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//114.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//115.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//116.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//117.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//118.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//119.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//120.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//121.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//122.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//123.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//124.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//125.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//126.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//127.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//128.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//129.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//130.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//131.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//132.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//133.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//134.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//135.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//136.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//137.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//138.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//139.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//140.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//141.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//142.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//143.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//144.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//145.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//146.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//147.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//148.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//149.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//150.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//151.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//152.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//153.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//154.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//155.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//156.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//157.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//158.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//159.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//160.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//161.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//162.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//163.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//164.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//165.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//166.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//167.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//168.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//169.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//170.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//171.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//172.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//173.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//174.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//175.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//176.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//177.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//178.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//179.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//180.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//181.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//182.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//183.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//184.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//185.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//186.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//187.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//188.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//189.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//190.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//191.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//192.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//193.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//194.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//195.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//196.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//197.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//198.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//199.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//200.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//201.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//202.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//203.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//204.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//205.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//206.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//207.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//208.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//209.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//210.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//211.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//212.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//213.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//214.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//215.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//216.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//217.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//218.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//219.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//220.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//221.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//222.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//223.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//224.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//225.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//226.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//227.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//228.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//229.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//230.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//231.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//232.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//233.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//234.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//235.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//236.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//237.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//238.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//239.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//240.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//241.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//242.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//243.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//244.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//245.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//246.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//247.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//248.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//249.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//250.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//251.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//252.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//253.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//254.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//255.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//256.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//257.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//258.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//259.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//260.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//261.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//262.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//263.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//264.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//265.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//266.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//267.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//268.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//269.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//270.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//271.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//272.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//273.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//274.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//275.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//276.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//277.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//278.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//279.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//280.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//281.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//282.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//283.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//284.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//285.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//286.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//287.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//288.jpeg', alt: "" },
+            { src: 'Jpeg Sorted//289.jpeg', alt: "" }
+        ];
+
+        const imagesPerPage = 20;
+        let currentPage = 1;
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        currentPage = urlParams.get('pg');
+
+        const grid = document.getElementById('galleryGrid');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+        const pageIndicator = document.getElementById('pageIndicator');
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('fullImage');
+        const caption = document.getElementById('caption');
+
+        function displayImages() {
+            grid.innerHTML = ""; // Clear current grid
+            
+            const start = (currentPage - 1) * imagesPerPage;
+            const end = start + imagesPerPage;
+            const paginatedItems = imageList.slice(start, end);
+
+            paginatedItems.forEach((imgData) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `<img src="${imgData.src}" alt="${imgData.alt}">`;
+                
+                item.addEventListener('click', () => {
+                    modal.style.display = "flex";
+                    modalImg.src = imgData.src;
+                    caption.innerText = imgData.alt;
+                });
+
+                grid.appendChild(item);
+            });
+
+            // Update Buttons & Text
+            pageIndicator.innerText = `Page ${currentPage} of ${Math.ceil(imageList.length / imagesPerPage)}`;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === Math.ceil(imageList.length / imagesPerPage);
+        }
+
+        // Pagination Button Logic
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayImages();
+                window.scrollTo(0, 0); // Scroll to top when page changes
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < Math.ceil(imageList.length / imagesPerPage)) {
+                currentPage++;
+                displayImages();
+                window.scrollTo(0, 0);
+            }
+        });
+
+        // Close Modal
+        document.querySelector('.close-btn').onclick = () => modal.style.display = "none";
+        modal.onclick = (e) => { if(e.target === modal) modal.style.display = "none"; };
+
+        // Initial Load
+        displayImages();
+    </script>
+</body>
+</html>
